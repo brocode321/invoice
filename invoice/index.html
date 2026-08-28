@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Faktur — Unggah Faktur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --white:#FFFFFF;
+    --paper:#F6FAF3;
+    --primary-green:#9FE870;
+    --deep-green:#163B22;
+    --mid-green:#4C7A3E;
+    --line:#D8ECC9;
+    --line-strong:#BEE0A6;
+    --radius-s:3px;
+    --radius-m:6px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--paper);
+    color:var(--deep-green);
+    font-family:'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:var(--mid-green); }
+
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  /* ---------- header ---------- */
+
+  .site-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px 32px;
+    background:var(--white);
+    border-bottom:1px solid var(--line);
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .brand-mark{
+    width:32px;
+    height:32px;
+    background:var(--deep-green);
+    border-radius:var(--radius-s);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+
+  .brand-mark svg{ width:16px; height:16px; }
+
+  .brand-name{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:18px;
+    letter-spacing:0.01em;
+  }
+
+  .header-link{
+    font-size:14px;
+    text-decoration:none;
+    color:var(--mid-green);
+    border-bottom:1px solid transparent;
+  }
+
+  .header-link:hover,
+  .header-link:focus-visible{
+    border-bottom-color:var(--mid-green);
+  }
+
+  /* ---------- layout ---------- */
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:56px 24px 80px;
+  }
+
+  .hero{
+    text-align:center;
+    margin-bottom:32px;
+  }
+
+  .eyebrow{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:0.12em;
+    color:var(--mid-green);
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(28px, 4.5vw, 38px);
+    margin:0 0 12px;
+    letter-spacing:-0.01em;
+  }
+
+  .hero p{
+    font-size:15px;
+    line-height:1.6;
+    color:var(--mid-green);
+    max-width:440px;
+    margin:0 auto;
+  }
+
+  /* ---------- invoice card ---------- */
+
+  .invoice-card{
+    background:var(--white);
+    border-radius:var(--radius-m);
+    overflow:hidden;
+    box-shadow:0 1px 2px rgba(22,59,34,0.06), 0 12px 32px -18px rgba(22,59,34,0.25);
+    border:1px solid var(--line);
+  }
+
+  .card-stub{
+    background:var(--primary-green);
+    padding:18px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+
+  .card-stub .ref{
+    font-size:12px;
+    letter-spacing:0.04em;
+    color:var(--deep-green);
+    font-weight:500;
+  }
+
+  .card-stub .status-dot{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:var(--deep-green);
+  }
+
+  .card-stub .status-dot span.dot{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--deep-green);
+    display:inline-block;
+  }
+
+  /* perforation / torn receipt edge */
+  .perforation{
+    height:14px;
+    background:
+      radial-gradient(circle, var(--paper) 7px, transparent 7.5px) 4px -7px/16px 16px repeat-x,
+      var(--primary-green);
+  }
+
+  .card-body{
+    padding:28px 24px 24px;
+  }
+
+  /* ---------- dropzone ---------- */
+
+  .dropzone{
+    border:1.5px dashed var(--line-strong);
+    border-radius:var(--radius-m);
+    padding:32px 20px;
+    text-align:center;
+    background:var(--paper);
+    transition:border-color .15s ease, background-color .15s ease;
+    cursor:pointer;
+  }
+
+  .dropzone.is-dragover{
+    border-color:var(--mid-green);
+    background:#EEF9E7;
+  }
+
+  .dropzone-icon{
+    width:40px;
+    height:40px;
+    margin:0 auto 12px;
+    border-radius:50%;
+    background:var(--white);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .dropzone-icon svg{ width:18px; height:18px; }
+
+  .dropzone-title{
+    font-size:14.5px;
+    font-weight:600;
+    margin:0 0 4px;
+  }
+
+  .dropzone-sub{
+    font-size:13px;
+    color:var(--mid-green);
+    margin:0 0 16px;
+  }
+
+  .choose-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--primary-green);
+    color:var(--deep-green);
+    border:none;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:600;
+    padding:10px 18px;
+    border-radius:var(--radius-s);
+    cursor:pointer;
+    transition:filter .15s ease;
+  }
+
+  .choose-btn:hover{ filter:brightness(0.95); }
+
+  .choose-btn:focus-visible,
+  button:focus-visible,
+  input:focus-visible{
+    outline:2px solid var(--deep-green);
+    outline-offset:2px;
+  }
+
+  /* ---------- line items (invoice style) ---------- */
+
+  .line-items{
+    list-style:none;
+    margin:20px 0 0;
+    padding:0;
+    font-size:12.5px;
+  }
+
+  .line-items li{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    padding:6px 0;
+    color:var(--mid-green);
+  }
+
+  .line-items li .label{ flex-shrink:0; }
+
+  .line-items li .fill{
+    flex:1;
+    border-bottom:1px dotted var(--line-strong);
+    height:1px;
+    transform:translateY(-3px);
+  }
+
+  .line-items li .value{
+    flex-shrink:0;
+    color:var(--deep-green);
+    font-weight:500;
+  }
+
+  /* ---------- selected file panel ---------- */
+
+  .selected-panel{
+    display:none;
+    margin-top:20px;
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    padding:16px;
+    position:relative;
+    background:var(--paper);
+  }
+
+  .selected-panel.is-visible{ display:block; }
+
+  .stamp{
+    position:absolute;
+    top:-14px;
+    right:14px;
+    border:1.5px solid var(--deep-green);
+    color:var(--deep-green);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    padding:4px 9px;
+    border-radius:3px;
+    transform:rotate(-6deg);
+    background:var(--white);
+  }
+
+  .file-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .file-icon{
+    width:34px;
+    height:34px;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius-s);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+
+  .file-icon svg{ width:15px; height:15px; }
+
+  .file-meta{ flex:1; min-width:0; }
+
+  .file-name{
+    font-size:13.5px;
+    font-weight:600;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .file-size{
+    font-size:12px;
+    color:var(--mid-green);
+  }
+
+  .remove-btn{
+    background:none;
+    border:none;
+    color:var(--mid-green);
+    cursor:pointer;
+    font-size:18px;
+    line-height:1;
+    padding:4px;
+  }
+
+  .remove-btn:hover{ color:var(--deep-green); }
+
+  .upload-btn{
+    width:100%;
+    margin-top:14px;
+    background:var(--deep-green);
+    color:var(--white);
+    border:none;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    padding:12px;
+    border-radius:var(--radius-s);
+    cursor:pointer;
+    transition:filter .15s ease;
+  }
+
+  .upload-btn:hover{ filter:brightness(1.15); }
+  .upload-btn:disabled{ opacity:0.6; cursor:default; }
+
+  /* ---------- error box (kept in-palette, no red) ---------- */
+
+  .error-box{
+    display:none;
+    margin-top:16px;
+    border-left:3px solid var(--deep-green);
+    background:var(--paper);
+    padding:10px 12px;
+    font-size:12.5px;
+    font-weight:500;
+  }
+
+  .error-box.is-visible{ display:block; }
+
+  /* ---------- history / riwayat ---------- */
+
+  .history{
+    margin-top:40px;
+  }
+
+  .history h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:18px;
+    margin:0 0 14px;
+  }
+
+  .history-table{
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    overflow:hidden;
+    background:var(--white);
+  }
+
+  .history-head{
+    display:grid;
+    grid-template-columns:1fr 90px 110px;
+    padding:10px 16px;
+    background:var(--paper);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--mid-green);
+    border-bottom:1px solid var(--line);
+  }
+
+  .history-row{
+    display:grid;
+    grid-template-columns:1fr 90px 110px;
+    padding:12px 16px;
+    font-size:13px;
+    align-items:center;
+    border-bottom:1px solid var(--line);
+  }
+
+  .history-row:last-child{ border-bottom:none; }
+
+  .history-row .fname{
+    font-weight:500;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .pill{
+    display:inline-block;
+    font-size:11px;
+    font-weight:600;
+    padding:3px 9px;
+    border-radius:100px;
+    background:var(--primary-green);
+    color:var(--deep-green);
+    justify-self:start;
+  }
+
+  .empty-state{
+    padding:32px 16px;
+    text-align:center;
+    font-size:13px;
+    color:var(--mid-green);
+  }
+
+  /* ---------- next step / lanjut ---------- */
+
+  .next-step{
+    margin-top:28px;
+    text-align:center;
+  }
+
+  .lanjut-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--deep-green);
+    color:var(--white);
+    border:none;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    padding:13px 28px;
+    border-radius:var(--radius-s);
+    cursor:pointer;
+    transition:filter .15s ease, opacity .15s ease;
+  }
+
+  .lanjut-btn svg{ width:14px; height:14px; transition:transform .15s ease; }
+
+  .lanjut-btn:hover:not(:disabled){ filter:brightness(1.15); }
+  .lanjut-btn:hover:not(:disabled) svg{ transform:translateX(3px); }
+
+  .lanjut-btn:disabled{
+    opacity:0.35;
+    cursor:not-allowed;
+    background:var(--mid-green);
+  }
+
+  .next-hint{
+    margin:10px 0 0;
+    font-size:12px;
+    color:var(--mid-green);
+  }
+
+  .next-hint.is-success{
+    color:var(--deep-green);
+    font-weight:500;
+  }
+
+  /* ---------- footer ---------- */
+
+  footer{
+    text-align:center;
+    padding:24px;
+    font-size:12px;
+    color:var(--mid-green);
+    border-top:1px solid var(--line);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+
+  @media (max-width:480px){
+    .site-header{ padding:16px 18px; }
+    main{ padding:36px 16px 60px; }
+    .history-head, .history-row{ grid-template-columns:1fr 70px; }
+    .history-head span:nth-child(2), .history-row .fsize{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 3H15L19 7V21H5V3Z" stroke="#9FE870" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M8 11H16M8 15H13" stroke="#9FE870" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">Portal Invoice</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <span class="eyebrow mono">REF · INV-2026-000452</span>
+      <h1>Unggah Invoice Anda</h1>
+      <p>Kirim berkas invoice dalam format PDF, JPG, atau PNG. Tim kami akan memverifikasi dan memprosesnya dalam 1×24 jam kerja.</p>
+    </div>
+
+    <div class="invoice-card">
+      <div class="card-stub">
+        <span class="ref mono">INVOICE MASUK</span>
+        <span class="status-dot"><span class="dot"></span>Menunggu berkas</span>
+      </div>
+      <div class="perforation"></div>
+
+      <div class="card-body">
+
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Pilih atau seret berkas faktur ke sini">
+          <div class="dropzone-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="#163B22" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16" stroke="#163B22" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="dropzone-title">Tarik &amp; lepas berkas invoice di sini</p>
+          <p class="dropzone-sub">atau</p>
+          <button type="button" class="choose-btn" id="chooseBtn">Pilih Berkas dari Perangkat</button>
+          <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" hidden>
+        </div>
+
+        <ul class="line-items">
+          <li><span class="label">Format berkas</span><span class="fill"></span><span class="value">PDF, JPG, PNG</span></li>
+          <li><span class="label">Ukuran maksimal</span><span class="fill"></span><span class="value">10 MB / berkas</span></li>
+        </ul>
+
+        <div class="error-box mono" id="errorBox"></div>
+
+        <div class="selected-panel" id="selectedPanel">
+          <span class="stamp">SIAP KIRIM</span>
+          <div class="file-row">
+            <div class="file-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 3H14L18 7V21H6V3Z" stroke="#163B22" stroke-width="1.6" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="file-meta">
+              <div class="file-name" id="fileName"></div>
+              <div class="file-size mono" id="fileSize"></div>
+            </div>
+            <button type="button" class="remove-btn" id="removeBtn" aria-label="Hapus berkas">×</button>
+          </div>
+          <button type="button" class="upload-btn" id="uploadBtn">Unggah Sekarang</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="history">
+      <h2>Riwayat Unggahan</h2>
+      <div class="history-table">
+        <div class="history-head">
+          <span>Nama Berkas</span>
+          <span>Ukuran</span>
+          <span>Status</span>
+        </div>
+        <div id="historyBody">
+          <div class="empty-state" id="emptyState">Belum ada invoice yang diunggah. Berkas yang Anda unggah akan muncul di sini.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-step">
+      <button type="button" class="lanjut-btn" id="lanjutBtn" disabled>
+        Lanjut
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <p class="next-hint" id="nextHint">Unggah minimal satu invoice untuk melanjutkan.</p>
+    </div>
+  </main>
+
+<script>
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const chooseBtn = document.getElementById('chooseBtn');
+  const selectedPanel = document.getElementById('selectedPanel');
+  const fileNameEl = document.getElementById('fileName');
+  const fileSizeEl = document.getElementById('fileSize');
+  const removeBtn = document.getElementById('removeBtn');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const errorBox = document.getElementById('errorBox');
+  const historyBody = document.getElementById('historyBody');
+  const emptyState = document.getElementById('emptyState');
+  const lanjutBtn = document.getElementById('lanjutBtn');
+  const nextHint = document.getElementById('nextHint');
+  let uploadCount = 0;
+
+  const ALLOWED = ['pdf', 'jpg', 'jpeg', 'png'];
+  const MAX_SIZE = 10 * 1024 * 1024;
+  let currentFile = null;
+
+  function formatSize(bytes){
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function showError(message){
+    errorBox.textContent = message;
+    errorBox.classList.add('is-visible');
+    selectedPanel.classList.remove('is-visible');
+  }
+
+  function clearError(){
+    errorBox.classList.remove('is-visible');
+    errorBox.textContent = '';
+  }
+
+  function handleFiles(files){
+    if (!files || !files.length) return;
+    const file = files[0];
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    if (!ALLOWED.includes(ext)){
+      showError('Format tidak didukung. Gunakan berkas PDF, JPG, atau PNG.');
+      return;
+    }
+    if (file.size > MAX_SIZE){
+      showError('Ukuran berkas melebihi batas 10 MB. Silakan kompres berkas Anda.');
+      return;
+    }
+
+    clearError();
+    currentFile = file;
+    fileNameEl.textContent = file.name;
+    fileSizeEl.textContent = formatSize(file.size);
+    selectedPanel.classList.add('is-visible');
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = 'Unggah Sekarang';
+  }
+
+  chooseBtn.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('click', (e) => {
+    if (e.target === dropzone) fileInput.click();
+  });
+  dropzone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+
+  fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropzone.classList.add('is-dragover');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(evt => {
+    dropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('is-dragover');
+    });
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    handleFiles(e.dataTransfer.files);
+  });
+
+  removeBtn.addEventListener('click', () => {
+    currentFile = null;
+    fileInput.value = '';
+    selectedPanel.classList.remove('is-visible');
+    clearError();
+  });
+
+  uploadBtn.addEventListener('click', () => {
+    if (!currentFile) return;
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Mengunggah...';
+
+    setTimeout(() => {
+      if (emptyState) emptyState.remove();
+
+      const row = document.createElement('div');
+      row.className = 'history-row';
+      row.innerHTML = `
+        <span class="fname mono">${currentFile.name}</span>
+        <span class="fsize mono">${formatSize(currentFile.size)}</span>
+        <span class="pill">Berhasil</span>
+      `;
+      historyBody.prepend(row);
+
+      uploadCount++;
+      lanjutBtn.disabled = false;
+      nextHint.textContent = uploadCount + ' faktur siap diproses.';
+      nextHint.classList.add('is-success');
+
+      currentFile = null;
+      fileInput.value = '';
+      selectedPanel.classList.remove('is-visible');
+      uploadBtn.disabled = false;
+      uploadBtn.textContent = 'Unggah Sekarang';
+    }, 900);
+  });
+
+  lanjutBtn.addEventListener('click', () => {
+    lanjutBtn.disabled = true;
+    lanjutBtn.textContent = 'Memproses...';
+    nextHint.textContent = 'Mengarahkan ke langkah berikutnya...';
+    // Sambungkan ke halaman/langkah berikutnya di sini, misalnya:
+    window.location.href = 'test123.html';
+  });
+</script>
+
+</body>
+</html>
